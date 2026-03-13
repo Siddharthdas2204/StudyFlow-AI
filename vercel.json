@@ -4,7 +4,9 @@
     {
       "src": "artifacts/studyflow/package.json",
       "use": "@vercel/static-build",
-      "config": { "distDir": "dist/public" }
+      "config": {
+        "distDir": "dist/public"
+      }
     },
     {
       "src": "artifacts/api-server/src/index.ts",
@@ -17,16 +19,11 @@
       "dest": "artifacts/api-server/src/index.ts"
     },
     {
-      "src": "/(.*)",
-      "dest": "artifacts/studyflow/$1",
-      "continue": true
-    },
-    {
       "handle": "filesystem"
     },
     {
       "src": "/(.*)",
-      "dest": "artifacts/studyflow/index.html"
+      "dest": "/index.html"
     }
   ]
 }
