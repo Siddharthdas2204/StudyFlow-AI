@@ -8,7 +8,7 @@
     "typecheck:libs": "tsc --build",
     "typecheck": "pnpm run typecheck:libs && pnpm -r --filter \"./artifacts/**\" --filter \"./scripts\" --if-present run typecheck",
     "db:push": "pnpm -C lib/db run push",
-    "dev": "pnpm -r run dev"
+    "dev": "pnpm -r --filter @workspace/studyflow --filter @workspace/api-server run dev"
   },
   "private": true,
   "devDependencies": {
