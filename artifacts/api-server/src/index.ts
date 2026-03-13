@@ -1,4 +1,5 @@
-import app from "./app";
+import "dotenv/config";
+import app from "./app.js";
 
 const rawPort = process.env["PORT"];
 
