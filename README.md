@@ -15,15 +15,14 @@ StudyFlow AI is a futuristic, all-in-one study platform powered by Groq LLaMA an
 
 ## 🛠️ Tech Stack
 
-- **Frontend**: React, Vite, Tailwind CSS (Modern "Cyberpunk" Design System), Framer Motion.
-- **Backend**: Node.js, Express, Groq SDK, Supabase Auth.
-- **Database**: PostgreSQL (Supabase) with Drizzle ORM.
+- **Framework**: Next.js 15 (App Router).
+- **Styling**: Tailwind CSS 4, Framer Motion (Modern "Cyberpunk" Design System).
+- **Backend & Auth**: Supabase Auth, Groq AI SDK.
+- **Packages**: Lucide-React, Sonner, React-Dropzone.
 - **Deployment**: Vercel (Production Ready).
 
-## ⚙️ Setup Instructions
-
 ### 1. Prerequisites
-- [pnpm](https://pnpm.io/) installed.
+- [npm](https://www.npmjs.com/) installed.
 - [Supabase](https://supabase.com/) project.
 - [Groq AI](https://console.groq.com/) API key.
 
@@ -35,22 +34,15 @@ cp .env.example .env
 
 ### 3. Install Dependencies
 ```bash
-pnpm install
+npm install
 ```
 
-### 4. Database Setup
-Push the schema to your Supabase database:
+### 4. Running Locally
 ```bash
-pnpm run db:push
+npm run dev
 ```
 
-### 5. Running Locally
-Start both the frontend and the API server:
-```bash
-pnpm run dev
-```
-
-The app will be available at `http://localhost:5173`.
+The app will be available at `http://localhost:3000`.
 
 ## 🌐 Deployment
 
