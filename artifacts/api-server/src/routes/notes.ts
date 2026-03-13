@@ -6,6 +6,9 @@ const router: IRouter = Router();
 
 router.get("/notes", async (req, res) => {
   try {
+    const userId = req.user?.id;
+    if (!userId) return res.status(401).json({ error: "Unauthorized" });
+
     const search = req.query.search as string | undefined;
     let notes;
     if (search) {
@@ -17,11 +20,12 @@ router.get("/notes", async (req, res) => {
             like(notesTable.title, `%${search}%`),
             like(notesTable.content, `%${search}%`),
             like(notesTable.tags, `%${search}%`)
-          )
+          ),
+          eq(notesTable.userId, userId)
         )
         .orderBy(notesTable.updatedAt);
     } else {
-      notes = await db.select().from(notesTable).orderBy(notesTable.updatedAt);
+      notes = await db.select().from(notesTable).where(eq(notesTable.userId, userId)).orderBy(notesTable.updatedAt);
     }
     res.json(notes.map(formatNote));
   } catch (e) {
@@ -31,10 +35,13 @@ router.get("/notes", async (req, res) => {
 
 router.post("/notes", async (req, res) => {
   try {
+    const userId = req.user?.id;
+    if (!userId) return res.status(401).json({ error: "Unauthorized" });
+
     const { title, content, tags, tldr, keyConcepts } = req.body;
     const [note] = await db
       .insert(notesTable)
-      .values({ title, content: content ?? "", tags: tags ?? "", tldr, keyConcepts })
+      .values({ userId, title, content: content ?? "", tags: tags ?? "", tldr, keyConcepts })
       .returning();
     res.status(201).json(formatNote(note));
   } catch (e) {

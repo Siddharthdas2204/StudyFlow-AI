@@ -1,6 +1,8 @@
-import { useAuth } from "@workspace/replit-auth-web";
+import { useAuth, supabase } from "@workspace/replit-auth-web";
+import { setTokenGetter } from "@workspace/api-client-react";
+import { useEffect } from "react";
 import { motion } from "framer-motion";
-import { Loader2, Brain, Sparkles, BookOpen, Code2, Target, Mic, Camera, Map, Zap } from "lucide-react";
+import { Loader2, Brain, Sparkles, BookOpen, Code2, Target, Mic, Camera, Map, Zap, Terminal } from "lucide-react";
 
 const FEATURES = [
   { icon: Brain, label: "AI Tutor Chat", color: "#7B5CFF" },
@@ -14,11 +16,22 @@ const FEATURES = [
 ];
 
 export function AuthGate({ children }: { children: React.ReactNode }) {
-  const { isLoading, isAuthenticated, login } = useAuth();
+  const { isLoading, isAuthenticated, login, mockLogin } = useAuth();
+
+  useEffect(() => {
+    setTokenGetter(async () => {
+      // Return "demo-token" if in mock mode
+      if (localStorage.getItem("mock_auth") === "true") {
+        return "demo-token";
+      }
+      const { data: { session } } = await supabase.auth.getSession();
+      return session?.access_token || null;
+    });
+  }, []);
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center"
+      <div className="min-h-screen flex items-center justify-center flex-col"
         style={{ background: 'linear-gradient(135deg, #050816 0%, #0B0F2A 50%, #050816 100%)' }}>
         <div className="flex flex-col items-center gap-4">
           <div className="relative">
@@ -48,8 +61,6 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
           style={{ background: 'radial-gradient(circle, rgba(123,92,255,0.18) 0%, transparent 70%)', filter: 'blur(40px)' }} />
         <div className="absolute bottom-[-10%] right-[5%] w-[400px] h-[400px] rounded-full pointer-events-none"
           style={{ background: 'radial-gradient(circle, rgba(57,198,255,0.14) 0%, transparent 70%)', filter: 'blur(40px)' }} />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[400px] rounded-full pointer-events-none"
-          style={{ background: 'radial-gradient(ellipse, rgba(90,107,255,0.08) 0%, transparent 70%)', filter: 'blur(60px)' }} />
 
         {/* Top nav */}
         <nav className="relative z-10 flex items-center justify-between px-8 md:px-16 py-6">
@@ -64,10 +75,16 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
             <a href="#features" className="hover:text-white transition-colors">Features</a>
             <a href="#about" className="hover:text-white transition-colors">About</a>
           </div>
-          <button onClick={login}
-            className="btn-primary text-sm px-6 py-2.5">
-            Sign In
-          </button>
+          <div className="flex gap-4">
+            <button onClick={mockLogin}
+              className="px-4 py-2 text-sm font-semibold text-white/70 hover:text-white border border-white/20 rounded-xl transition-all hover:bg-white/10 glass">
+              Demo Mode
+            </button>
+            <button onClick={login}
+              className="btn-primary text-sm px-6 py-2.5">
+              Sign In
+            </button>
+          </div>
         </nav>
 
         {/* Hero Section */}
@@ -115,9 +132,9 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
                   <Sparkles className="w-5 h-5" />
                   Start Learning Free
                 </button>
-                <button onClick={login} className="btn-outline-neon text-base flex items-center gap-2.5 px-8 py-3.5">
-                  <Brain className="w-5 h-5" />
-                  Explore Features
+                <button onClick={mockLogin} className="btn-outline-neon text-base flex items-center gap-2.5 px-8 py-3.5">
+                  <Terminal className="w-5 h-5" />
+                  Try Demo Mode
                 </button>
               </div>
             </motion.div>
@@ -136,11 +153,10 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.2 + i * 0.06, duration: 0.5 }}
                   className="card-neon p-4 cursor-default"
-                  style={{ animationDelay: `${i * 0.5}s` }}
                 >
                   <div className="w-9 h-9 rounded-xl flex items-center justify-center mb-3"
                     style={{ background: `${color}18`, border: `1px solid ${color}30` }}>
-                    <Icon className="w-4.5 h-4.5" style={{ color, width: '18px', height: '18px' }} />
+                    <Icon className="w-4.5 h-4.5" style={{ color }} />
                   </div>
                   <p className="text-[13px] font-semibold text-white leading-snug">{label}</p>
                 </motion.div>
@@ -160,7 +176,7 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
           className="relative z-10 text-center py-8 px-8"
         >
           <p className="text-sm text-[rgba(255,255,255,0.35)]">
-            Powered by <span className="text-[#7B5CFF] font-semibold">Groq LLaMA</span> · Voice Tutor · Image AI · PDF Mode · Spaced Repetition
+            Powered by <span className="text-[#7B5CFF] font-semibold text-gradient">Groq LLaMA</span> · Voice Tutor · Image AI · PDF Mode
           </p>
         </motion.div>
       </div>

@@ -4,6 +4,7 @@ import { z } from "zod/v4";
 
 export const studyPlansTable = pgTable("study_plans", {
   id: serial("id").primaryKey(),
+  userId: text("user_id").notNull(),
   subjects: text("subjects").notNull(),
   examDate: text("exam_date").notNull(),
   planData: text("plan_data").notNull(),

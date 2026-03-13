@@ -19,6 +19,16 @@ export async function supabaseAuthMiddleware(
     return next(); // Not authenticated but let it pass to routes (some might be public)
   }
 
+  // Handle demo token for local development
+  if (token === "demo-token" && process.env.NODE_ENV !== "production") {
+    req.user = {
+      id: "mock-user-id",
+      username: "DemoScholar",
+      email: "demo@studyflow.ai"
+    } as any;
+    return next();
+  }
+
   try {
     const { data: { user }, error } = await supabase.auth.getUser(token);
 

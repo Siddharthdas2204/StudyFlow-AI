@@ -4,6 +4,7 @@ import { z } from "zod/v4";
 
 export const flashcardsTable = pgTable("flashcards", {
   id: serial("id").primaryKey(),
+  userId: text("user_id").notNull(),
   noteId: integer("note_id"),
   question: text("question").notNull(),
   answer: text("answer").notNull(),
