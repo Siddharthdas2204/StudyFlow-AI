@@ -3,7 +3,7 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import path from "path";
 import { fileURLToPath } from "url";
-import { authMiddleware } from "./middlewares/authMiddleware.js";
+import { supabaseAuthMiddleware } from "./middlewares/supabaseAuth.js";
 import router from "./routes/index.js";
 
 const __filename = fileURLToPath(import.meta.url);
@@ -16,7 +16,7 @@ app.use(cors({ credentials: true, origin: true }));
 app.use(cookieParser());
 app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ extended: true, limit: "50mb" }));
-app.use(authMiddleware);
+app.use(supabaseAuthMiddleware);
 
 app.use("/api", router);
 

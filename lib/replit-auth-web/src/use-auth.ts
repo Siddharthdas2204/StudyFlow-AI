@@ -1,7 +1,12 @@
 import { useState, useEffect, useCallback } from "react";
-import type { AuthUser } from "@workspace/api-client-react";
+import { supabase } from "@/lib/supabase";
+import type { User } from "@supabase/supabase-js";
 
-export type { AuthUser };
+export interface AuthUser {
+  id: string;
+  username: string;
+  email?: string;
+}
 
 interface AuthState {
   user: AuthUser | null;
@@ -16,38 +21,49 @@ export function useAuth(): AuthState {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    let cancelled = false;
+    // Get initial session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session?.user) {
+        setUser({
+          id: session.user.id,
+          username: session.user.email?.split('@')[0] || 'User',
+          email: session.user.email
+        });
+      }
+      setIsLoading(false);
+    });
 
-    fetch("/api/auth/user", { credentials: "include" })
-      .then((res) => {
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        return res.json() as Promise<{ user: AuthUser | null }>;
-      })
-      .then((data) => {
-        if (!cancelled) {
-          setUser(data.user ?? null);
-          setIsLoading(false);
-        }
-      })
-      .catch(() => {
-        if (!cancelled) {
-          setUser(null);
-          setIsLoading(false);
-        }
-      });
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (session?.user) {
+        setUser({
+          id: session.user.id,
+          username: session.user.email?.split('@')[0] || 'User',
+          email: session.user.email
+        });
+      } else {
+        setUser(null);
+      }
+      setIsLoading(false);
+    });
 
-    return () => {
-      cancelled = true;
-    };
+    return () => subscription.unsubscribe();
   }, []);
 
-  const login = useCallback(() => {
-    const base = import.meta.env.BASE_URL.replace(/\/+$/, "") || "/";
-    window.location.href = `/api/login?returnTo=${encodeURIComponent(base)}`;
+  const login = useCallback(async () => {
+    // Basic Google login as example, or just redirect to Supabase hosted UI
+    // For now, let's use the simplest: redirect to Supabase login or show a basic popup
+    await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: window.location.origin
+      }
+    });
   }, []);
 
-  const logout = useCallback(() => {
-    window.location.href = "/api/logout";
+  const logout = useCallback(async () => {
+    await supabase.auth.signOut();
+    window.location.reload();
   }, []);
 
   return {
