@@ -62,7 +62,7 @@
   }
   
   .glass-card {
-    @apply glass rounded-[2rem] p-8 transition-all duration-500 hover:bg-white/[0.05] hover:border-primary/40 hover:shadow-[0_0_40px_rgba(139,92,246,0.15)];
+    @apply bg-white/[0.03] backdrop-blur-[20px] border border-white/[0.08] shadow-[0_8px_32px_0_rgba(0,0,0,0.8)] rounded-[2rem] p-8 transition-all duration-500 hover:bg-white/[0.05] hover:border-primary/40 hover:shadow-[0_0_40px_rgba(139,92,246,0.15)];
   }
 
   .neon-halo {
