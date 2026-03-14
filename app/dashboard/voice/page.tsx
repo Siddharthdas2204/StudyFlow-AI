@@ -11,25 +11,90 @@ export default function VoiceTutorPage() {
   const [transcript, setTranscript] = useState("");
   const [response, setResponse] = useState("");
 
-  const toggleListening = () => {
-    setIsListening(!isListening);
-    if (!isListening) {
-      // Mock transcript after delay
-      setTimeout(() => {
-        setTranscript("Can you explain the difference between aerobic and anaerobic respiration?");
+  const [recognition, setRecognition] = useState<any>(null);
+
+  useEffect(() => {
+    if (typeof window !== "undefined" && ("webkitSpeechRecognition" in window || "SpeechRecognition" in window)) {
+      const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+      const rec = new SpeechRecognition();
+      rec.continuous = false;
+      rec.interimResults = true;
+      rec.lang = 'en-US';
+
+      rec.onresult = (event: any) => {
+        const text = Array.from(event.results)
+          .map((result: any) => result[0])
+          .map((result: any) => result.transcript)
+          .join('');
+        setTranscript(text);
+        
+        if (event.results[0].isFinal) {
+           rec.stop();
+           processVoiceCommand(text);
+        }
+      };
+
+      rec.onerror = (event: any) => {
+        console.error("Speech recognition error", event);
         setIsListening(false);
-        simulateResponse();
-      }, 3000);
+      };
+
+      rec.onend = () => {
+        setIsListening(false);
+      }
+
+      setRecognition(rec);
+    }
+    
+    return () => {
+      if (typeof window !== "undefined" && "speechSynthesis" in window) {
+         window.speechSynthesis.cancel();
+      }
+    }
+  }, []);
+
+  const toggleListening = () => {
+    if (!recognition) return alert("Speech Recognition not supported in this browser. Try Chrome.");
+    
+    if (isListening) {
+      recognition.stop();
+      setIsListening(false);
+    } else {
+      setTranscript("");
+      setResponse("");
+      try { recognition.start(); } catch(e) {}
+      setIsListening(true);
+      window.speechSynthesis.cancel();
     }
   };
 
-  const simulateResponse = () => {
+  const processVoiceCommand = async (text: string) => {
     setIsSpeaking(true);
-    setResponse("Aerobic respiration requires oxygen to produce energy (ATP), while anaerobic respiration occurs in the absence of oxygen and produces less ATP plus lactic acid or ethanol...");
-    // Mock speaking duration
-    setTimeout(() => {
+    try {
+      const res = await fetch("/api/voice", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: text })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error);
+
+      setResponse(data.reply);
+      speakText(data.reply);
+    } catch (e: any) {
+      setResponse("I'm sorry, my neural link to StudyFlow is currently unstable.");
       setIsSpeaking(false);
-    }, 5000);
+    }
+  };
+
+  const speakText = (text: string) => {
+    if ("speechSynthesis" in window) {
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.onend = () => setIsSpeaking(false);
+      window.speechSynthesis.speak(utterance);
+    } else {
+      setIsSpeaking(false);
+    }
   };
 
   return (

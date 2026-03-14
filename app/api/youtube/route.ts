@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+// @ts-ignore
 import { getSubtitles } from 'youtube-captions-scraper';
 import { groq, MODELS } from '@/lib/groq';
 

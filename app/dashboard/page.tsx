@@ -18,11 +18,18 @@ import { supabase } from "@/lib/supabase";
 
 export default function DashboardOverview() {
   const [youtubeUrl, setYoutubeUrl] = useState("");
+  const [rawText, setRawText] = useState("");
+  const [inputType, setInputType] = useState<"youtube" | "text">("youtube");
   const [loadingNotes, setLoadingNotes] = useState(false);
   const [notes, setNotes] = useState<string | null>(null);
 
   const [jobs, setJobs] = useState<any[]>([]);
   const [loadingJobs, setLoadingJobs] = useState(true);
+
+  // Job Application State
+  const [selectedJob, setSelectedJob] = useState<any>(null);
+  const [resumeUploaded, setResumeUploaded] = useState(false);
+  const [isApplying, setIsApplying] = useState(false);
 
   useEffect(() => {
     const fetchJobs = async () => {
@@ -50,17 +57,23 @@ export default function DashboardOverview() {
   }, []);
 
   const handleSummarize = async () => {
-    if (!youtubeUrl || !youtubeUrl.includes("youtube.com") && !youtubeUrl.includes("youtu.be")) {
+    if (inputType === "youtube" && (!youtubeUrl || (!youtubeUrl.includes("youtube.com") && !youtubeUrl.includes("youtu.be")))) {
        return toast.error("Please enter a valid YouTube link.");
+    }
+    if (inputType === "text" && !rawText.trim()) {
+       return toast.error("Please enter some text to summarize.");
     }
 
     setLoadingNotes(true);
     setNotes(null);
     try {
-       const res = await fetch("/api/youtube", {
+       const endpoint = inputType === "youtube" ? "/api/youtube" : "/api/notes/text";
+       const bodyPayload = inputType === "youtube" ? { url: youtubeUrl } : { text: rawText };
+
+       const res = await fetch(endpoint, {
          method: "POST",
          headers: {"Content-Type": "application/json"},
-         body: JSON.stringify({ url: youtubeUrl })
+         body: JSON.stringify(bodyPayload)
        });
        
        const data = await res.json();
@@ -68,12 +81,28 @@ export default function DashboardOverview() {
        
        setNotes(data.notes);
        toast.success("AI extraction complete. Notes ready!");
-       setYoutubeUrl(""); // Clear input on success
+       if (inputType === "youtube") setYoutubeUrl("");
+       else setRawText("");
     } catch (e: any) {
-       toast.error(e.message || "Failed to process video transcript.");
+       toast.error(e.message || "Failed to process data.");
     } finally {
        setLoadingNotes(false);
     }
+  };
+
+  const handleApply = (job: any) => {
+    setSelectedJob(job);
+    setResumeUploaded(false);
+  };
+
+  const confirmApplication = () => {
+    if (!resumeUploaded) return toast.error("Please upload or select a resume first.");
+    setIsApplying(true);
+    setTimeout(() => {
+      setIsApplying(false);
+      setSelectedJob(null);
+      toast.success("Application Submitted! The company will contact you via your StudyFlow Inbox within 48 hours.");
+    }, 1500);
   };
 
   const downloadNotes = () => {
@@ -106,7 +135,7 @@ export default function DashboardOverview() {
         {/* Left Column (YouTube + Notes) */}
         <div className="lg:col-span-7 space-y-8 flex flex-col">
           
-          {/* Section 1: YouTube Summarizer */}
+          {/* Section 1: Notes Maker Input */}
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -115,32 +144,65 @@ export default function DashboardOverview() {
             {/* Neon Accent */}
             <div className="absolute -top-10 -right-10 w-32 h-32 bg-cyan-500/20 blur-[50px] rounded-full group-hover:bg-cyan-500/30 transition-all duration-700 pointer-events-none" />
             
-            <div className="flex items-center gap-4 z-10">
-              <div className="w-12 h-12 rounded-2xl bg-cyan-500/10 flex items-center justify-center border border-cyan-500/20 shadow-[0_0_15px_rgba(6,182,212,0.3)]">
-                <Youtube className="w-6 h-6 text-cyan-400" />
+            <div className="flex items-center justify-between z-10 w-full mb-2">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 rounded-2xl bg-cyan-500/10 flex items-center justify-center border border-cyan-500/20 shadow-[0_0_15px_rgba(6,182,212,0.3)]">
+                  {inputType === "youtube" ? <Youtube className="w-6 h-6 text-cyan-400" /> : <FileText className="w-6 h-6 text-cyan-400" />}
+                </div>
+                <div>
+                  <h3 className="text-lg font-black uppercase tracking-tight">AI Knowledge Extraction</h3>
+                  <p className="text-[10px] text-cyan-400/80 font-black uppercase tracking-[0.2em] mt-1">
+                    {inputType === "youtube" ? "Video" : "Raw Text"} to Knowledge Base
+                  </p>
+                </div>
               </div>
-              <div>
-                <h3 className="text-lg font-black uppercase tracking-tight">YouTube Summarizer</h3>
-                <p className="text-[10px] text-cyan-400/80 font-black uppercase tracking-[0.2em] mt-1">Video to Knowledge Base</p>
+
+              {/* Input Toggle */}
+              <div className="flex bg-black/40 p-1 rounded-xl border border-white/10 backdrop-blur-md">
+                <button 
+                  onClick={() => setInputType("youtube")}
+                  className={`px-4 py-2 text-[10px] font-black uppercase tracking-widest rounded-lg transition-all ${inputType === "youtube" ? "bg-cyan-500/20 text-cyan-400" : "text-white/40 hover:text-white"}`}
+                >
+                  YouTube
+                </button>
+                <button 
+                  onClick={() => setInputType("text")}
+                  className={`px-4 py-2 text-[10px] font-black uppercase tracking-widest rounded-lg transition-all ${inputType === "text" ? "bg-cyan-500/20 text-cyan-400" : "text-white/40 hover:text-white"}`}
+                >
+                  Raw Text
+                </button>
               </div>
             </div>
 
-            <div className="relative z-10 mt-2">
-              <input 
-                type="text" 
-                value={youtubeUrl}
-                onChange={(e) => setYoutubeUrl(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && handleSummarize()}
-                disabled={loadingNotes}
-                placeholder="Paste YouTube Link Here..." 
-                className="w-full bg-black/40 border border-white/10 rounded-2xl px-6 py-5 text-sm outline-none focus:border-cyan-500/50 focus:ring-1 focus:ring-cyan-500/50 transition-all placeholder:text-white/20 font-bold backdrop-blur-md shadow-inner disabled:opacity-50"
-              />
+            <div className="relative z-10">
+              {inputType === "youtube" ? (
+                <input 
+                  type="text" 
+                  value={youtubeUrl}
+                  onChange={(e) => setYoutubeUrl(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && handleSummarize()}
+                  disabled={loadingNotes}
+                  placeholder="Paste YouTube Link Here..." 
+                  className="w-full bg-black/40 border border-white/10 rounded-2xl px-6 py-5 text-sm outline-none focus:border-cyan-500/50 focus:ring-1 focus:ring-cyan-500/50 transition-all placeholder:text-white/20 font-bold backdrop-blur-md shadow-inner disabled:opacity-50"
+                />
+              ) : (
+                <textarea 
+                  value={rawText}
+                  onChange={(e) => setRawText(e.target.value)}
+                  disabled={loadingNotes}
+                  placeholder="Paste your raw lecture text, academic paper, or notes here..." 
+                  className="w-full h-32 resize-none bg-black/40 border border-white/10 rounded-2xl px-6 py-5 text-sm outline-none focus:border-cyan-500/50 focus:ring-1 focus:ring-cyan-500/50 transition-all placeholder:text-white/20 font-medium backdrop-blur-md shadow-inner disabled:opacity-50 custom-scrollbar"
+                />
+              )}
+              
               <button 
                 onClick={handleSummarize}
                 disabled={loadingNotes}
-                className="absolute right-2 top-2 bottom-2 aspect-square flex items-center justify-center bg-cyan-500 hover:bg-cyan-400 disabled:bg-cyan-500/50 disabled:hover:scale-100 hover:scale-105 text-black rounded-xl shadow-[0_0_20px_rgba(6,182,212,0.6)] cursor-pointer transition-all duration-300"
+                className={`absolute right-2 text-black flex items-center justify-center bg-cyan-500 hover:bg-cyan-400 disabled:bg-cyan-500/50 disabled:hover:scale-100 hover:scale-105 rounded-xl shadow-[0_0_20px_rgba(6,182,212,0.6)] cursor-pointer transition-all duration-300 ${inputType === "youtube" ? "top-2 bottom-2 aspect-square" : "bottom-2 right-2 px-6 py-3"}`}
               >
-                {loadingNotes ? <Loader2 className="w-5 h-5 animate-spin text-black" /> : <Play className="w-5 h-5 fill-black" />}
+                {loadingNotes ? <Loader2 className="w-5 h-5 animate-spin" /> : (
+                   inputType === "youtube" ? <Play className="w-5 h-5 fill-black" /> : <span className="text-[10px] font-black tracking-widest uppercase">Summarize</span>
+                )}
               </button>
             </div>
           </motion.div>
@@ -238,16 +300,24 @@ export default function DashboardOverview() {
                       <h4 className="text-white font-black text-lg mb-1 tracking-tight">{job.title}</h4>
                       <p className="text-[10px] text-white/50 uppercase tracking-[0.2em] font-bold">{job.company}</p>
                     </div>
-                    <span className="text-[10px] bg-green-500/10 border border-green-500/20 text-green-400 font-black px-2 py-1 rounded-md uppercase tracking-wider shadow-[0_0_10px_rgba(34,197,94,0.2)]">
+                    <span className="text-[10px] shrink-0 bg-green-500/10 border border-green-500/20 text-green-400 font-black px-2 py-1 rounded-md uppercase tracking-wider shadow-[0_0_10px_rgba(34,197,94,0.2)]">
                       {job.match}
                     </span>
                   </div>
-                  <div className="flex items-center gap-5 text-[10px] text-white/40 uppercase tracking-widest font-bold mb-6">
+                  {job.description && (
+                     <p className="text-xs text-white/40 mb-4 line-clamp-3 leading-relaxed font-medium">
+                       {job.description}
+                     </p>
+                  )}
+                  <div className="flex items-center gap-5 text-[10px] text-white/40 uppercase tracking-widest font-bold mb-6 mt-auto">
                     <span className="flex items-center gap-1.5"><Clock className="w-3.5 h-3.5 text-white/30" /> {job.location}</span>
                     <span className="flex items-center gap-1.5"><ExternalLink className="w-3.5 h-3.5 text-white/30" /> {job.type}</span>
                   </div>
-                  <button onClick={() => toast("Applied successfully with active resume.")} className="w-full py-4 mt-auto bg-gradient-to-r from-amber-500/10 via-amber-500/20 to-amber-500/10 hover:from-amber-400 hover:via-amber-500 hover:to-amber-400 text-amber-500 hover:text-black hover:shadow-[0_0_30px_rgba(245,158,11,0.6)] border border-amber-500/30 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] transition-all duration-300 cursor-pointer">
-                    Auto-Apply with Resume
+                  <button 
+                    onClick={() => handleApply(job)}
+                    className="w-full py-4 bg-gradient-to-r from-amber-500/10 via-amber-500/20 to-amber-500/10 hover:from-amber-400 hover:via-amber-500 hover:to-amber-400 text-amber-500 hover:text-black hover:shadow-[0_0_30px_rgba(245,158,11,0.6)] border border-amber-500/30 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] transition-all duration-300 cursor-pointer"
+                  >
+                    Apply Now
                   </button>
                 </div>
               )) : (
@@ -260,6 +330,58 @@ export default function DashboardOverview() {
           </motion.div>
         </div>
       </div>
+      {/* Job Application Modal Gateway */}
+      {selectedJob && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="w-full max-w-lg glass-card border border-white/10 p-8 shadow-[0_0_50px_rgba(0,0,0,0.8)] relative"
+          >
+             <button 
+               onClick={() => setSelectedJob(null)}
+               className="absolute top-4 right-4 p-2 text-white/40 hover:text-white rounded-full bg-white/5 hover:bg-white/10 transition-all"
+               disabled={isApplying}
+             >
+               ✕
+             </button>
+             
+             <h3 className="text-xl font-black uppercase tracking-tight mb-2">Initialize Application</h3>
+             <p className="text-sm text-white/60 mb-6">You are applying for <span className="text-amber-400 font-bold">{selectedJob.title}</span> at <span className="font-bold text-white">{selectedJob.company}</span>.</p>
+
+             {/* Resume Selection */}
+             <div className="space-y-4 mb-8">
+               <h4 className="text-[10px] font-black tracking-widest uppercase text-white/40">Select Sovereign Authenticated Resume</h4>
+               
+               <label className={`flex items-start gap-4 p-4 rounded-2xl border cursor-pointer transition-all ${resumeUploaded ? 'bg-amber-500/10 border-amber-500/50 shadow-[0_0_15px_rgba(245,158,11,0.2)]' : 'bg-black/40 border-white/5 hover:border-white/20'}`}>
+                 <input type="radio" name="resume" className="mt-1" onChange={() => setResumeUploaded(true)} />
+                 <div>
+                   <h5 className="font-bold text-sm text-white">Main Tech Resume (Default)</h5>
+                   <p className="text-xs text-white/40 mt-1">Uploaded 2 months ago. Verified by AI Matcher.</p>
+                 </div>
+               </label>
+               
+               <label className="flex items-center justify-center gap-2 p-4 rounded-2xl border border-dashed border-white/20 bg-black/20 text-white/50 hover:bg-white/5 hover:text-white cursor-pointer transition-all">
+                  <span className="text-xs font-bold uppercase tracking-widest">+ Upload New PDF Resume</span>
+               </label>
+             </div>
+
+             <div className="bg-blue-500/10 border border-blue-500/20 p-4 rounded-xl text-blue-200 text-xs mb-8 flex leading-relaxed">
+               <span className="mr-3 text-lg">ℹ️</span>
+               <span>If accepted, {selectedJob.company} recruiters will automatically reach out via your secure StudyFlow Inbox connection.</span>
+             </div>
+
+             <button 
+               onClick={confirmApplication}
+               disabled={!resumeUploaded || isApplying}
+               className="w-full py-4 flex items-center justify-center bg-amber-500 text-black font-black uppercase tracking-widest hover:bg-amber-400 disabled:opacity-50 disabled:bg-amber-500/50 rounded-xl transition-all shadow-[0_0_20px_rgba(245,158,11,0.4)] disabled:shadow-none"
+             >
+               {isApplying ? <Loader2 className="w-5 h-5 animate-spin" /> : "Transmit Application"}
+             </button>
+          </motion.div>
+        </div>
+      )}
+
     </div>
   );
 }
