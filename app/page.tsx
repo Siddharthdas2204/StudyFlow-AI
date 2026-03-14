@@ -1,21 +1,56 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Sparkles, Bot, Brain, BookOpen, Calculator, Code, Rocket, ArrowRight, Github, Chrome, Zap } from "lucide-react";
+import { Sparkles, Bot, Brain, BookOpen, Calculator, Code, Rocket, ArrowRight, Github, Chrome, Zap, Youtube, Briefcase } from "lucide-react";
 import Link from "next/link";
+import { useEffect, useState } from "react";
 
 const features = [
   { icon: Bot, title: "Socrates AI Tutor", desc: "Interactive study coaching with voice & context awareness." },
   { icon: Brain, title: "Vision Doubt Solver", desc: "Upload high-res photos for instant step-by-step logic." },
-  { icon: BookOpen, title: "Lecture to Notes", desc: "Convert complex audio into beautiful structured markdown." },
-  { icon: Calculator, title: "Exam Predictor", desc: "Smart logic that anticipates your actual exam questions." },
-  { icon: Code, title: "Coding Playground", desc: "Elite coding environment with AI-powered optimization." },
+  { icon: BookOpen, title: "Notes Maker", desc: "Convert texts into beautiful structured markdown." },
+  { icon: Youtube, title: "YouTube Summarizer", desc: "Extract knowledge bases directly from any YouTube video." },
+  { icon: Briefcase, title: "AI Job Searcher", desc: "Get automatically matched to top tech roles using your resume." },
   { icon: Rocket, title: "Study Roadmap", desc: "Architectural learning paths designed for your goals." }
 ];
 
+const TwinklingStars = () => {
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+  if (!mounted) return null;
+
+  return (
+    <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
+      {[...Array(60)].map((_, i) => (
+        <motion.div
+           key={i}
+           className="absolute bg-white rounded-full"
+           style={{
+             width: Math.random() * 3 + 1 + 'px',
+             height: Math.random() * 3 + 1 + 'px',
+             top: Math.random() * 100 + '%',
+             left: Math.random() * 100 + '%',
+             boxShadow: '0 0 10px rgba(255, 255, 255, 0.8)',
+           }}
+           animate={{
+             opacity: [0, 0.7, 0],
+             scale: [0.5, 1.2, 0.5],
+           }}
+           transition={{
+             duration: Math.random() * 3 + 2,
+             repeat: Infinity,
+             delay: Math.random() * 5,
+           }}
+        />
+      ))}
+    </div>
+  );
+};
+
 export default function LandingPage() {
   return (
-    <div className="flex flex-col items-center selection:bg-primary/30 min-h-screen">
+    <div className="flex flex-col items-center selection:bg-primary/30 min-h-screen relative overflow-hidden">
+      <TwinklingStars />
       {/* Navbar */}
       <nav className="w-full max-w-7xl px-8 py-10 flex justify-between items-center bg-transparent relative z-50">
         <motion.div 
@@ -35,7 +70,7 @@ export default function LandingPage() {
           className="hidden md:flex items-center gap-10 text-xs font-bold uppercase tracking-widest text-white/50"
         >
           <Link href="#features" className="hover:text-white transition-colors">Features</Link>
-          <Link href="#about" className="hover:text-white transition-colors">Platform</Link>
+          <Link href="#platform" className="hover:text-white transition-colors">Platform</Link>
           <Link href="/login" className="px-8 py-3 glass rounded-full hover:bg-white/[0.05] transition-all border-white/10 text-white">
             Connect
           </Link>
@@ -84,18 +119,19 @@ export default function LandingPage() {
             <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform relative z-10 text-white" />
             <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
           </Link>
-          <button className="px-10 py-5 glass text-white rounded-[2rem] font-black uppercase tracking-widest text-xs hover:bg-white/[0.05] transition-all flex items-center justify-center gap-3 border-white/10 group">
+          <Link href="#features" className="px-10 py-5 glass text-white rounded-[2rem] font-black uppercase tracking-widest text-xs hover:bg-white/[0.05] transition-all flex items-center justify-center gap-3 border-white/10 group">
             Explore Core
-          </button>
+          </Link>
         </motion.div>
       </section>
 
       {/* Stats Section */}
       <motion.div 
+        id="platform"
         initial={{ opacity: 0 }}
         whileInView={{ opacity: 1 }}
         transition={{ duration: 1.5 }}
-        className="mt-40 grid grid-cols-2 lg:grid-cols-4 gap-12 border-y border-white/[0.05] py-20 w-full max-w-6xl px-12 glass" style={{ borderLeft: 'none', borderRight: 'none', borderRadius: '0' }}
+        className="mt-40 grid grid-cols-2 lg:grid-cols-4 gap-12 border-y border-white/[0.05] py-20 w-full max-w-6xl px-12 glass z-10 relative" style={{ borderLeft: 'none', borderRight: 'none', borderRadius: '0' }}
       >
         {[
           { label: "Elite Members", val: "10K+" },
