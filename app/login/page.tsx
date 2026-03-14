@@ -20,7 +20,13 @@ export default function LoginPage() {
         },
       });
 
-      if (error) throw error;
+      if (error) {
+        if (error.message.includes("provider is not enabled")) {
+          toast.error("Google Login is not enabled in Supabase. Please enable it in Authentication > Providers.");
+        } else {
+          throw error;
+        }
+      }
     } catch (error: any) {
       toast.error(error.message || "Failed to sign in with Google");
       setIsLoading(false);
