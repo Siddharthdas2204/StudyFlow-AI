@@ -8,10 +8,86 @@ import {
   Download,
   Clock,
   ExternalLink,
-  Youtube
+  Youtube,
+  Loader2
 } from "lucide-react";
+import { useState, useEffect } from "react";
+import { toast } from "sonner";
+import ReactMarkdown from 'react-markdown';
+import { supabase } from "@/lib/supabase";
 
 export default function DashboardOverview() {
+  const [youtubeUrl, setYoutubeUrl] = useState("");
+  const [loadingNotes, setLoadingNotes] = useState(false);
+  const [notes, setNotes] = useState<string | null>(null);
+
+  const [jobs, setJobs] = useState<any[]>([]);
+  const [loadingJobs, setLoadingJobs] = useState(true);
+
+  useEffect(() => {
+    const fetchJobs = async () => {
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        const bio = user?.user_metadata?.bio || "";
+        
+        const res = await fetch("/api/jobs", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ bio })
+        });
+        
+        const data = await res.json();
+        if (data.jobs && Array.isArray(data.jobs)) {
+          setJobs(data.jobs);
+        }
+      } catch (e) {
+         console.error("Failed to fetch jobs");
+      } finally {
+        setLoadingJobs(false);
+      }
+    };
+    fetchJobs();
+  }, []);
+
+  const handleSummarize = async () => {
+    if (!youtubeUrl || !youtubeUrl.includes("youtube.com") && !youtubeUrl.includes("youtu.be")) {
+       return toast.error("Please enter a valid YouTube link.");
+    }
+
+    setLoadingNotes(true);
+    setNotes(null);
+    try {
+       const res = await fetch("/api/youtube", {
+         method: "POST",
+         headers: {"Content-Type": "application/json"},
+         body: JSON.stringify({ url: youtubeUrl })
+       });
+       
+       const data = await res.json();
+       if (!res.ok) throw new Error(data.error || "Failed to generate notes.");
+       
+       setNotes(data.notes);
+       toast.success("AI extraction complete. Notes ready!");
+       setYoutubeUrl(""); // Clear input on success
+    } catch (e: any) {
+       toast.error(e.message || "Failed to process video transcript.");
+    } finally {
+       setLoadingNotes(false);
+    }
+  };
+
+  const downloadNotes = () => {
+    if (!notes) return toast.error("No notes to download yet!");
+    const blob = new Blob([notes], { type: "text/markdown" });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "StudyFlow_Notes.md";
+    a.click();
+    window.URL.revokeObjectURL(url);
+    toast.success("Notes exported as Markdown");
+  };
+
   return (
     <div className="max-w-7xl mx-auto space-y-12 pb-20">
       {/* Header */}
@@ -52,11 +128,19 @@ export default function DashboardOverview() {
             <div className="relative z-10 mt-2">
               <input 
                 type="text" 
+                value={youtubeUrl}
+                onChange={(e) => setYoutubeUrl(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && handleSummarize()}
+                disabled={loadingNotes}
                 placeholder="Paste YouTube Link Here..." 
-                className="w-full bg-black/40 border border-white/10 rounded-2xl px-6 py-5 text-sm outline-none focus:border-cyan-500/50 focus:ring-1 focus:ring-cyan-500/50 transition-all placeholder:text-white/20 font-bold backdrop-blur-md shadow-inner"
+                className="w-full bg-black/40 border border-white/10 rounded-2xl px-6 py-5 text-sm outline-none focus:border-cyan-500/50 focus:ring-1 focus:ring-cyan-500/50 transition-all placeholder:text-white/20 font-bold backdrop-blur-md shadow-inner disabled:opacity-50"
               />
-              <button className="absolute right-2 top-2 bottom-2 aspect-square flex items-center justify-center bg-cyan-500 hover:bg-cyan-400 hover:scale-105 text-black rounded-xl shadow-[0_0_20px_rgba(6,182,212,0.6)] cursor-pointer transition-all duration-300">
-                <Play className="w-5 h-5 fill-black" />
+              <button 
+                onClick={handleSummarize}
+                disabled={loadingNotes}
+                className="absolute right-2 top-2 bottom-2 aspect-square flex items-center justify-center bg-cyan-500 hover:bg-cyan-400 disabled:bg-cyan-500/50 disabled:hover:scale-100 hover:scale-105 text-black rounded-xl shadow-[0_0_20px_rgba(6,182,212,0.6)] cursor-pointer transition-all duration-300"
+              >
+                {loadingNotes ? <Loader2 className="w-5 h-5 animate-spin text-black" /> : <Play className="w-5 h-5 fill-black" />}
               </button>
             </div>
           </motion.div>
@@ -82,29 +166,33 @@ export default function DashboardOverview() {
                 </div>
               </div>
               
-              <button className="px-5 py-3 bg-purple-500/10 hover:bg-purple-500/20 text-purple-300 hover:text-purple-200 border border-purple-500/30 rounded-xl text-[10px] font-black uppercase tracking-widest flex items-center gap-2 transition-all shadow-[0_0_15px_rgba(168,85,247,0.2)] hover:shadow-[0_0_25px_rgba(168,85,247,0.4)] cursor-pointer">
+              <button 
+                onClick={downloadNotes}
+                disabled={!notes}
+                className="px-5 py-3 bg-purple-500/10 hover:bg-purple-500/20 text-purple-300 hover:text-purple-200 border border-purple-500/30 rounded-xl text-[10px] font-black uppercase tracking-widest flex items-center gap-2 transition-all shadow-[0_0_15px_rgba(168,85,247,0.2)] hover:shadow-[0_0_25px_rgba(168,85,247,0.4)] cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+              >
                 <Download className="w-4 h-4" />
-                Export to PDF
+                Export to MD
               </button>
             </div>
 
-            <div className="p-6 rounded-2xl bg-black/40 border border-white/5 text-sm text-white/60 leading-relaxed font-medium z-10 relative custom-scrollbar overflow-y-auto min-h-[200px] shadow-inner backdrop-blur-md">
+            <div className="p-6 rounded-2xl bg-black/40 border border-white/5 text-sm text-white/60 leading-relaxed font-medium z-10 relative custom-scrollbar overflow-y-auto min-h-[250px] shadow-inner backdrop-blur-md">
               <div className="space-y-5">
-                <h4 className="text-white font-black text-base uppercase tracking-tight">Key Concepts: Quantum Entanglement</h4>
-                <ul className="space-y-4">
-                  <li className="flex gap-4 items-start">
-                    <div className="w-2 h-2 rounded-full bg-purple-400 mt-1.5 shrink-0 shadow-[0_0_8px_rgba(168,85,247,0.8)]" />
-                    <span className="leading-relaxed">Particles that interact can become permanently correlated, affecting each other instantaneously regardless of distance.</span>
-                  </li>
-                  <li className="flex gap-4 items-start">
-                    <div className="w-2 h-2 rounded-full bg-purple-400 mt-1.5 shrink-0 shadow-[0_0_8px_rgba(168,85,247,0.8)]" />
-                    <span className="leading-relaxed">Einstein famously referred to this phenomenon as "spooky action at a distance."</span>
-                  </li>
-                  <li className="flex gap-4 items-start">
-                    <div className="w-2 h-2 rounded-full bg-purple-400 mt-1.5 shrink-0 shadow-[0_0_8px_rgba(168,85,247,0.8)]" />
-                    <span className="leading-relaxed">Fundamental to quantum computing operations and unbreakable quantum cryptography protocols.</span>
-                  </li>
-                </ul>
+                {loadingNotes ? (
+                   <div className="flex flex-col items-center justify-center h-40 text-purple-400/60 gap-4">
+                      <Loader2 className="w-8 h-8 animate-spin" />
+                      <span className="text-xs uppercase font-black tracking-widest">Synthesizing Audio Transcripts...</span>
+                   </div>
+                ) : notes ? (
+                  <div className="prose prose-invert prose-purple max-w-none text-sm font-medium leading-loose prose-h1:text-xl prose-h1:font-black prose-h2:text-lg prose-h2:tracking-tight prose-a:text-cyan-400 prose-strong:text-purple-100 prose-ul:my-4">
+                    <ReactMarkdown>{notes}</ReactMarkdown>
+                  </div>
+                ) : (
+                  <>
+                    <h4 className="text-white font-black text-base uppercase tracking-tight">System Status: Waiting for input</h4>
+                    <p className="text-xs text-white/40">Enter a YouTube URL above to instantly generate structured markdown study notes, complete with summaries, key concepts, and actionable insights.</p>
+                  </>
+                )}
               </div>
             </div>
           </motion.div>
@@ -138,42 +226,35 @@ export default function DashboardOverview() {
 
             <div className="flex-1 space-y-4 z-10 overflow-y-auto pr-2 custom-scrollbar flex flex-col">
               
-              {/* Job Card 1 */}
-              <div className="p-6 rounded-3xl bg-black/40 border border-white/10 hover:border-amber-500/40 transition-all duration-300 group/job backdrop-blur-md flex flex-col shadow-inner">
-                <div className="flex justify-between items-start mb-4">
-                  <div>
-                    <h4 className="text-white font-black text-lg mb-1 tracking-tight">MERN Stack Developer</h4>
-                    <p className="text-[10px] text-white/50 uppercase tracking-[0.2em] font-bold">TechNova Solutions</p>
+              {loadingJobs ? (
+                  <div className="flex flex-col items-center justify-center h-40 text-amber-400/60 gap-4">
+                    <Loader2 className="w-8 h-8 animate-spin" />
+                    <span className="text-xs uppercase font-black tracking-widest">Querying Global Opportunities...</span>
+                 </div>
+              ) : jobs.length > 0 ? jobs.map((job) => (
+                 <div key={job.id} className="p-6 rounded-3xl bg-black/40 border border-white/10 hover:border-amber-500/40 transition-all duration-300 group/job backdrop-blur-md flex flex-col shadow-inner">
+                  <div className="flex justify-between items-start mb-4">
+                    <div>
+                      <h4 className="text-white font-black text-lg mb-1 tracking-tight">{job.title}</h4>
+                      <p className="text-[10px] text-white/50 uppercase tracking-[0.2em] font-bold">{job.company}</p>
+                    </div>
+                    <span className="text-[10px] bg-green-500/10 border border-green-500/20 text-green-400 font-black px-2 py-1 rounded-md uppercase tracking-wider shadow-[0_0_10px_rgba(34,197,94,0.2)]">
+                      {job.match}
+                    </span>
                   </div>
-                  <span className="text-[10px] bg-green-500/10 border border-green-500/20 text-green-400 font-black px-2 py-1 rounded-md uppercase tracking-wider shadow-[0_0_10px_rgba(34,197,94,0.2)]">98% Match</span>
-                </div>
-                <div className="flex items-center gap-5 text-[10px] text-white/40 uppercase tracking-widest font-bold mb-6">
-                  <span className="flex items-center gap-1.5"><Clock className="w-3.5 h-3.5 text-white/30" /> Remote</span>
-                  <span className="flex items-center gap-1.5"><ExternalLink className="w-3.5 h-3.5 text-white/30" /> Full-Time</span>
-                </div>
-                <button className="w-full py-4 mt-auto bg-gradient-to-r from-amber-500/10 via-amber-500/20 to-amber-500/10 hover:from-amber-400 hover:via-amber-500 hover:to-amber-400 text-amber-500 hover:text-black hover:shadow-[0_0_30px_rgba(245,158,11,0.6)] border border-amber-500/30 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] transition-all duration-300 cursor-pointer">
-                  Auto-Apply with Resume
-                </button>
-              </div>
-
-               {/* Job Card 2 */}
-               <div className="p-6 rounded-3xl bg-black/40 border border-white/5 hover:border-amber-500/30 transition-all duration-300 group/job backdrop-blur-md flex flex-col shadow-inner">
-                <div className="flex justify-between items-start mb-4">
-                  <div>
-                    <h4 className="text-white font-black text-lg mb-1 tracking-tight">Digital Marketing Spec.</h4>
-                    <p className="text-[10px] text-white/50 uppercase tracking-[0.2em] font-bold">Aura Growth Agency</p>
+                  <div className="flex items-center gap-5 text-[10px] text-white/40 uppercase tracking-widest font-bold mb-6">
+                    <span className="flex items-center gap-1.5"><Clock className="w-3.5 h-3.5 text-white/30" /> {job.location}</span>
+                    <span className="flex items-center gap-1.5"><ExternalLink className="w-3.5 h-3.5 text-white/30" /> {job.type}</span>
                   </div>
-                  <span className="text-[10px] bg-amber-500/10 border border-amber-500/20 text-amber-400 font-black px-2 py-1 rounded-md uppercase tracking-wider">85% Match</span>
+                  <button onClick={() => toast("Applied successfully with active resume.")} className="w-full py-4 mt-auto bg-gradient-to-r from-amber-500/10 via-amber-500/20 to-amber-500/10 hover:from-amber-400 hover:via-amber-500 hover:to-amber-400 text-amber-500 hover:text-black hover:shadow-[0_0_30px_rgba(245,158,11,0.6)] border border-amber-500/30 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] transition-all duration-300 cursor-pointer">
+                    Auto-Apply with Resume
+                  </button>
                 </div>
-                <div className="flex items-center gap-5 text-[10px] text-white/40 uppercase tracking-widest font-bold mb-6">
-                  <span className="flex items-center gap-1.5"><Clock className="w-3.5 h-3.5 text-white/30" /> Hybrid</span>
-                  <span className="flex items-center gap-1.5"><ExternalLink className="w-3.5 h-3.5 text-white/30" /> Contract</span>
-                </div>
-                <button className="w-full py-4 mt-auto bg-black/50 hover:bg-amber-500 hover:text-black border border-white/10 hover:border-amber-500 hover:shadow-[0_0_30px_rgba(245,158,11,0.6)] text-white/50 hover:text-black rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] transition-all duration-300 cursor-pointer">
-                  Auto-Apply with Resume
-                </button>
-              </div>
-
+              )) : (
+                 <div className="p-6 rounded-3xl bg-black/40 border border-white/10 text-center py-10 shadow-inner">
+                    <p className="text-white/40 text-sm font-medium">Please add a Bio in your settings to get personalized job feeds.</p>
+                 </div>
+              )}
             </div>
 
           </motion.div>

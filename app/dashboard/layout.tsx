@@ -139,10 +139,12 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
         </nav>
 
         <div className="p-6 border-t border-white/5 space-y-2">
-          <button className="flex items-center gap-4 w-full px-4 py-4 rounded-2xl hover:bg-white/[0.03] text-white/40 hover:text-white transition-all group">
-            <Settings className="w-5 h-5 group-hover:rotate-45 transition-transform" />
-            {!isCollapsed && <span className="text-xs font-bold uppercase tracking-widest">Settings</span>}
-          </button>
+          <Link href="/dashboard/settings">
+            <button className="flex items-center gap-4 w-full px-4 py-4 rounded-2xl hover:bg-white/[0.03] text-white/40 hover:text-white transition-all group">
+              <Settings className="w-5 h-5 group-hover:rotate-45 transition-transform" />
+              {!isCollapsed && <span className="text-xs font-bold uppercase tracking-widest">Settings</span>}
+            </button>
+          </Link>
           <button 
             onClick={handleLogout}
             className="flex items-center gap-4 w-full px-4 py-4 rounded-2xl hover:bg-red-500/10 text-red-500/40 hover:text-red-500 transition-all group"
