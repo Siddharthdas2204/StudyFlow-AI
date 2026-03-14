@@ -1,10 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { User, Mail, Shield, Smartphone, Bell, Eye, EyeOff, Save, Loader2, Camera } from "lucide-react";
+import { User, Mail, Shield, Smartphone, Bell, Eye, EyeOff, Save, Loader2, Camera, LogOut } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
+import { useRouter } from "next/navigation";
 
 export default function SettingsPage() {
   const [user, setUser] = useState<any>(null);
@@ -16,6 +17,18 @@ export default function SettingsPage() {
     bio: ""
   });
   const [activeTab, setActiveTab] = useState("Profile");
+  const router = useRouter();
+
+  const handleLogout = async () => {
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (error) throw error;
+      toast.success("Logged out successfully");
+      router.push("/");
+    } catch (error: any) {
+      toast.error(error.message || "Failed to log out");
+    }
+  };
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -159,9 +172,18 @@ export default function SettingsPage() {
               <div className="glass-card p-8 bg-red-500/5 border-red-500/10">
                 <h4 className="text-sm font-bold text-red-500 mb-2 uppercase tracking-widest">Danger Zone</h4>
                 <p className="text-xs text-white/40 mb-6">Once you delete your account, there is no going back. Please be certain.</p>
-                <button className="px-6 py-2 border border-red-500/20 text-red-500 text-xs font-bold rounded-lg hover:bg-red-500 hover:text-white transition-all">
-                  Delete Account
-                </button>
+                <div className="flex items-center gap-4">
+                  <button className="px-6 py-2 border border-red-500/20 text-red-500 text-xs font-bold rounded-lg hover:bg-red-500 hover:text-white transition-all">
+                    Delete Account
+                  </button>
+                  <button 
+                    onClick={handleLogout}
+                    className="px-6 py-2 border border-white/20 text-white/60 text-xs font-bold rounded-lg hover:bg-white/10 hover:text-white transition-all flex items-center gap-2"
+                  >
+                    <LogOut className="w-4 h-4" />
+                    Secure Sign Out
+                  </button>
+                </div>
               </div>
             </>
           )}
