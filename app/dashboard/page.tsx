@@ -361,8 +361,19 @@ export default function DashboardOverview() {
                  </div>
                </label>
                
-               <label className="flex items-center justify-center gap-2 p-4 rounded-2xl border border-dashed border-white/20 bg-black/20 text-white/50 hover:bg-white/5 hover:text-white cursor-pointer transition-all">
-                  <span className="text-xs font-bold uppercase tracking-widest">+ Upload New PDF Resume</span>
+               <label className="relative flex items-center justify-center gap-2 p-4 rounded-2xl border border-dashed border-white/20 bg-black/20 text-white/50 hover:bg-white/5 hover:text-white cursor-pointer transition-all overflow-hidden group">
+                  <input 
+                    type="file" 
+                    accept=".pdf" 
+                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                    onChange={(e) => {
+                      if (e.target.files && e.target.files[0]) {
+                        setResumeUploaded(true);
+                        toast.success(`Attached ${e.target.files[0].name} successfully!`);
+                      }
+                    }}
+                  />
+                  <span className="text-xs font-bold uppercase tracking-widest group-hover:scale-105 transition-transform">+ Upload New PDF Resume</span>
                </label>
              </div>
 

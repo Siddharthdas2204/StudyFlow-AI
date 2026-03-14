@@ -13,7 +13,8 @@ import {
   Settings,
   LogOut,
   Menu,
-  X
+  X,
+  Mail
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
@@ -25,6 +26,7 @@ import { User, AuthChangeEvent, Session } from "@supabase/supabase-js";
 
 const sidebarItems = [
   { icon: LayoutDashboard, label: "Overview", href: "/dashboard" },
+  { icon: Mail, label: "Inbox", href: "/dashboard/inbox" },
   { icon: MessageSquare, label: "Socrates AI", href: "/dashboard/chat" },
   { icon: ImageIcon, label: "Doubt Solver", href: "/dashboard/solve" },
   { icon: FileText, label: "Lecture Notes", href: "/dashboard/notes" },
