@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Brain, Chrome, ArrowLeft, Sparkles } from "lucide-react";
+import { Chrome, ArrowLeft, Sparkles, Zap } from "lucide-react";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
 import { toast } from "sonner";
@@ -34,60 +34,57 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-6 relative">
-      <div className="absolute top-6 left-6">
+    <div className="min-h-screen flex items-center justify-center p-8 relative selection:bg-primary/30">
+      <div className="absolute top-10 left-10 z-50">
         <Link 
           href="/" 
-          className="flex items-center gap-2 text-white/50 hover:text-white transition-colors group"
+          className="flex items-center gap-3 px-6 py-3 glass rounded-full text-white/40 hover:text-white transition-all border-white/10 group"
         >
           <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
-          <span className="text-sm font-medium">Back to Home</span>
+          <span className="text-[10px] font-black uppercase tracking-widest">Return to Base</span>
         </Link>
       </div>
 
       <motion.div 
-        initial={{ opacity: 0, y: 20 }}
+        initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
-        className="w-full max-w-md"
+        transition={{ duration: 0.8 }}
+        className="w-full max-w-lg"
       >
-        <div className="glass-card p-10 flex flex-col items-center text-center relative overflow-hidden">
-          {/* Decorative background elements */}
-          <div className="absolute -top-24 -right-24 w-48 h-48 bg-primary/10 rounded-full blur-3xl pointer-events-none" />
-          <div className="absolute -bottom-24 -left-24 w-48 h-48 bg-purple-600/10 rounded-full blur-3xl pointer-events-none" />
-
-          <div className="w-16 h-16 bg-primary/20 rounded-2xl flex items-center justify-center neon-glow mb-8">
-            <Brain className="w-8 h-8 text-primary" />
+        <div className="glass-card p-16 flex flex-col items-center text-center relative overflow-hidden">
+          <div className="w-20 h-20 glass rounded-[2rem] flex items-center justify-center border-primary/20 neon-halo mb-12">
+            <Zap className="w-10 h-10 text-primary" />
           </div>
 
-          <h1 className="text-3xl font-black tracking-tight mb-3">Welcome Back</h1>
-          <p className="text-white/50 text-sm mb-10 leading-relaxed">
-            Elevate your learning experience with AI-powered study tools.
+          <h1 className="text-4xl font-black tracking-tight mb-4 uppercase">Initialize Session</h1>
+          <p className="text-white/40 text-sm mb-12 max-w-xs font-medium leading-relaxed">
+            Securely connect your account to access the decentralized knowledge network.
           </p>
 
-          <div className="w-full space-y-4">
+          <div className="w-full space-y-6">
             <button
               onClick={handleGoogleLogin}
               disabled={isLoading}
-              className="w-full py-4 glass hover:bg-white/5 rounded-2xl font-bold flex items-center justify-center gap-3 transition-all active:scale-[0.98] relative group overflow-hidden"
+              className="w-full py-5 glass hover:bg-white/[0.05] rounded-[2rem] font-black uppercase tracking-widest text-[10px] flex items-center justify-center gap-4 transition-all active:scale-[0.98] border-white/10 group relative overflow-hidden"
             >
-              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
-              <Chrome className="w-5 h-5" />
-              <span>{isLoading ? "Connecting..." : "Continue with Google"}</span>
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
+              <Chrome className="w-5 h-5 text-primary" />
+              <span className="relative z-10">{isLoading ? "Verifying..." : "Sovereign Login with Google"}</span>
             </button>
 
-            <div className="relative py-4">
+            <div className="relative py-6">
               <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-white/5"></div>
+                <div className="w-full border-t border-white/[0.05]"></div>
               </div>
               <div className="relative flex justify-center">
-                <span className="bg-[#0b0b14] px-4 text-[10px] font-black uppercase tracking-widest text-white/20">
-                  Secured by Supabase
+                <span className="glass px-6 py-1 rounded-full text-[8px] font-black uppercase tracking-[0.4em] text-white/20 border-white/5">
+                  Quantum Auth Protocol
                 </span>
               </div>
             </div>
 
-            <p className="text-[11px] text-white/30 px-6">
-              By continuing, you agree to StudyFlow's Terms of Service and Privacy Policy.
+            <p className="text-[9px] text-white/20 px-10 italic uppercase tracking-[0.1em]">
+              Your data is encrypted via end-to-end neural pathways. By connecting, you accept the StudyFlow protocol.
             </p>
           </div>
         </div>
@@ -95,11 +92,11 @@ export default function LoginPage() {
         <motion.div 
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 0.5 }}
-          className="mt-8 flex items-center justify-center gap-2 text-xs text-white/20 font-medium"
+          transition={{ delay: 1, duration: 1 }}
+          className="mt-12 flex items-center justify-center gap-3 text-[10px] text-white/20 font-black uppercase tracking-[0.3em]"
         >
-          <Sparkles className="w-3 h-3" />
-          <span>Join 10,000+ students worldwide</span>
+          <Sparkles className="w-4 h-4 text-primary" />
+          <span>Active Nodes: 12,482</span>
         </motion.div>
       </motion.div>
     </div>

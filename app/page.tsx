@@ -1,79 +1,91 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Sparkles, Bot, Brain, BookOpen, Calculator, Code, Rocket, ArrowRight, Github, Chrome } from "lucide-react";
+import { Sparkles, Bot, Brain, BookOpen, Calculator, Code, Rocket, ArrowRight, Github, Chrome, Zap } from "lucide-react";
 import Link from "next/link";
 
 const features = [
-  { icon: Bot, title: "Socrates AI Tutor", desc: "Interactive study coaching with voice & context" },
-  { icon: Brain, title: "Vision Doubt Solver", desc: "Upload a photo, get a step-by-step solution" },
-  { icon: BookOpen, title: "Lecture to Notes", desc: "Turn any audio lecture into structured notes" },
-  { icon: Calculator, title: "Exam Predictor", desc: "Smart prediction of your next exam questions" },
-  { icon: Code, title: "Coding Playground", desc: "Run code and get AI-powered explanations" },
-  { icon: Rocket, title: "Study Roadmap", desc: "Personalized learning paths for any goal" }
+  { icon: Bot, title: "Socrates AI Tutor", desc: "Interactive study coaching with voice & context awareness." },
+  { icon: Brain, title: "Vision Doubt Solver", desc: "Upload high-res photos for instant step-by-step logic." },
+  { icon: BookOpen, title: "Lecture to Notes", desc: "Convert complex audio into beautiful structured markdown." },
+  { icon: Calculator, title: "Exam Predictor", desc: "Smart logic that anticipates your actual exam questions." },
+  { icon: Code, title: "Coding Playground", desc: "Elite coding environment with AI-powered optimization." },
+  { icon: Rocket, title: "Study Roadmap", desc: "Architectural learning paths designed for your goals." }
 ];
 
 export default function LandingPage() {
   return (
-    <div className="flex flex-col items-center">
+    <div className="flex flex-col items-center selection:bg-primary/30 min-h-screen">
       {/* Navbar */}
-      <nav className="w-full max-w-7xl px-6 py-6 flex justify-between items-center bg-transparent">
-        <div className="flex items-center gap-2 group cursor-pointer">
-          <div className="p-2 bg-primary/20 rounded-xl group-hover:bg-primary/30 transition-all neon-glow">
-            <Brain className="w-6 h-6 text-primary" />
+      <nav className="w-full max-w-7xl px-8 py-10 flex justify-between items-center bg-transparent relative z-50">
+        <motion.div 
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          className="flex items-center gap-3 group cursor-pointer"
+        >
+          <div className="p-3 glass rounded-2xl group-hover:scale-110 transition-transform duration-500 neon-halo">
+            <Zap className="w-6 h-6 text-primary" />
           </div>
-          <span className="text-xl font-bold tracking-tight">StudyFlow<span className="text-primary">.ai</span></span>
-        </div>
+          <span className="text-2xl font-black tracking-tighter">STUDYFLOW<span className="text-primary font-black">.ai</span></span>
+        </motion.div>
         
-        <div className="hidden md:flex items-center gap-8 text-sm font-medium text-white/70">
+        <motion.div 
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          className="hidden md:flex items-center gap-10 text-xs font-bold uppercase tracking-widest text-white/50"
+        >
           <Link href="#features" className="hover:text-white transition-colors">Features</Link>
-          <Link href="#about" className="hover:text-white transition-colors">About</Link>
-          <Link href="/login" className="px-5 py-2 glass rounded-full hover:bg-white/10 transition-all">Sign In</Link>
-        </div>
+          <Link href="#about" className="hover:text-white transition-colors">Platform</Link>
+          <Link href="/login" className="px-8 py-3 glass rounded-full hover:bg-white/[0.05] transition-all border-white/10 text-white">
+            Connect
+          </Link>
+        </motion.div>
       </nav>
 
       {/* Hero Section */}
-      <section className="mt-20 md:mt-32 px-6 flex flex-col items-center text-center max-w-4xl mx-auto">
+      <section className="relative mt-20 md:mt-40 px-6 flex flex-col items-center text-center max-w-6xl mx-auto z-10">
         <motion.div 
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="px-4 py-1 glass rounded-full text-xs font-semibold text-primary mb-6 flex items-center gap-2 border-primary/20"
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="px-6 py-2 glass rounded-full text-[10px] font-black uppercase tracking-[0.3em] text-primary mb-10 border-primary/20 flex items-center gap-3 backdrop-blur-3xl"
         >
-          <Sparkles className="w-3 h-3" />
-          <span>The Next Gen of Academic Achievement</span>
+          <Sparkles className="w-4 h-4" />
+          <span>Genesis Of Academic Intelligence</span>
         </motion.div>
 
         <motion.h1 
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-          className="text-5xl md:text-7xl lg:text-8xl font-black tracking-tight mb-8 leading-[1.1]"
+          transition={{ duration: 0.8, ease: "easeOut" }}
+          className="text-6xl md:text-8xl lg:text-[10rem] font-black tracking-tight mb-12 leading-[0.9] text-white"
         >
-          Study <span className="text-gradient">Smarter</span>,<br />Not Harder.
+          Architect Your <br />
+          <span className="text-gradient">Future.</span>
         </motion.h1>
 
         <motion.p 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-          className="text-lg md:text-xl text-white/60 mb-10 max-w-2xl leading-relaxed"
+          transition={{ delay: 0.2, duration: 0.8 }}
+          className="text-lg md:text-2xl text-white/40 mb-16 max-w-3xl leading-relaxed font-light"
         >
-          Unleash the power of AI to transform your learning journey. Solve doubts with a photo, 
-          predict exam questions, and master any subject in record time.
+          The world's most sophisticated AI study ecosystem. Immerse yourself in a workspace 
+          designed for elite performance and cognitive mastery.
         </motion.p>
 
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
-          className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto"
+          transition={{ delay: 0.4 }}
+          className="flex flex-col sm:flex-row gap-6 w-full sm:w-auto"
         >
-          <Link href="/dashboard" className="px-8 py-4 bg-primary text-white rounded-2xl font-bold shadow-xl shadow-primary/20 hover:scale-105 transition-all flex items-center justify-center gap-2 group">
-            Get Started Free
-            <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+          <Link href="/dashboard" className="px-10 py-5 bg-primary text-white rounded-[2rem] font-black uppercase tracking-widest text-xs shadow-2xl shadow-primary/40 hover:scale-105 transition-all flex items-center justify-center gap-3 group relative overflow-hidden">
+            <span className="relative z-10 text-white">Initialize System</span>
+            <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform relative z-10 text-white" />
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
           </Link>
-          <button className="px-8 py-4 glass text-white rounded-2xl font-bold hover:bg-white/10 transition-all flex items-center justify-center gap-2">
-            Explore Demo
+          <button className="px-10 py-5 glass text-white rounded-[2rem] font-black uppercase tracking-widest text-xs hover:bg-white/[0.05] transition-all flex items-center justify-center gap-3 border-white/10 group">
+            Explore Core
           </button>
         </motion.div>
       </section>
@@ -82,74 +94,83 @@ export default function LandingPage() {
       <motion.div 
         initial={{ opacity: 0 }}
         whileInView={{ opacity: 1 }}
-        transition={{ duration: 1 }}
-        className="mt-24 grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-16 border-y border-white/5 py-12 w-full max-w-5xl px-6"
+        transition={{ duration: 1.5 }}
+        className="mt-40 grid grid-cols-2 lg:grid-cols-4 gap-12 border-y border-white/[0.05] py-20 w-full max-w-6xl px-12 glass" style={{ borderLeft: 'none', borderRight: 'none', borderRadius: '0' }}
       >
-        <div className="text-center">
-          <h3 className="text-3xl font-bold text-white mb-1">10k+</h3>
-          <p className="text-xs text-white/40 uppercase tracking-widest font-semibold">Active Scholars</p>
-        </div>
-        <div className="text-center">
-          <h3 className="text-3xl font-bold text-white mb-1">98%</h3>
-          <p className="text-xs text-white/40 uppercase tracking-widest font-semibold">Success Rate</p>
-        </div>
-        <div className="text-center">
-          <h3 className="text-3xl font-bold text-white mb-1">24/7</h3>
-          <p className="text-xs text-white/40 uppercase tracking-widest font-semibold">AI Support</p>
-        </div>
-        <div className="text-center">
-          <h3 className="text-3xl font-bold text-white mb-1">5 Min</h3>
-          <p className="text-xs text-white/40 uppercase tracking-widest font-semibold">Avg Study Boost</p>
-        </div>
+        {[
+          { label: "Elite Members", val: "10K+" },
+          { label: "Logic Accuracy", val: "99.4%" },
+          { label: "Neural Latency", val: "<50ms" },
+          { label: "Knowledge Base", val: "1PB+" }
+        ].map((stat, i) => (
+          <div key={i} className="text-center group">
+            <h3 className="text-4xl font-black text-white mb-2 group-hover:text-primary transition-colors duration-500">{stat.val}</h3>
+            <p className="text-[10px] text-white/30 uppercase tracking-[0.2em] font-black leading-none">{stat.label}</p>
+          </div>
+        ))}
       </motion.div>
 
       {/* Features Grid */}
-      <section id="features" className="py-32 px-6 w-full max-w-7xl mx-auto">
-        <div className="text-center mb-20">
-          <h2 className="text-4xl md:text-5xl font-black tracking-tight mb-4">Supercharged Learning</h2>
-          <p className="text-white/60">Tools built for the modern academic landscape.</p>
+      <section id="features" className="py-40 px-8 w-full max-w-7xl mx-auto relative">
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[500px] bg-primary/5 blur-[120px] rounded-full pointer-events-none" />
+        
+        <div className="text-center mb-32 relative z-10">
+          <h2 className="text-4xl md:text-6xl font-black tracking-tight mb-6">Quantum Capabilities</h2>
+          <p className="text-white/40 text-lg font-light tracking-wide max-w-2xl mx-auto">Proprietary AI models fine-tuned for academic excellence.</p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 relative z-10">
           {features.map((f, i) => (
             <motion.div
               key={i}
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
-              transition={{ delay: i * 0.1 }}
+              transition={{ delay: i * 0.1, duration: 0.6 }}
               viewport={{ once: true }}
-              className="glass-card hover:translate-y-[-8px]"
+              className="glass-card flex flex-col items-start text-left group"
             >
-              <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center mb-6 neon-glow">
-                <f.icon className="w-6 h-6 text-primary" />
+              <div className="w-16 h-16 glass rounded-2xl flex items-center justify-center mb-8 border-primary/20 group-hover:scale-110 group-hover:border-primary/50 transition-all duration-500">
+                <f.icon className="w-8 h-8 text-primary group-hover:text-white transition-colors" />
               </div>
-              <h3 className="text-xl font-bold mb-3">{f.title}</h3>
-              <p className="text-sm text-white/50 leading-relaxed mb-6">{f.desc}</p>
-              <div className="w-full h-[1px] bg-white/5 mb-6" />
-              <button className="text-sm font-semibold text-primary/80 hover:text-primary transition-colors flex items-center gap-1 group">
-                Learn more <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-              </button>
+              <h3 className="text-2xl font-black mb-4 tracking-tight">{f.title}</h3>
+              <p className="text-white/40 text-sm leading-relaxed mb-10 font-medium">{f.desc}</p>
+              <div className="mt-auto w-full pt-8 border-t border-white/[0.05] flex items-center justify-between">
+                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white/20">System Core v4.0</span>
+                <ArrowRight className="w-4 h-4 text-primary opacity-0 group-hover:opacity-100 group-hover:translate-x-2 transition-all" />
+              </div>
             </motion.div>
           ))}
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="w-full border-t border-white/5 py-12 px-6 mt-32">
-        <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-8">
-          <div className="flex items-center gap-2">
-            <Brain className="w-5 h-5 text-primary" />
-            <span className="font-bold">StudyFlow.ai</span>
+      <footer className="w-full border-t border-white/[0.05] py-24 px-12 mt-40 glass" style={{ borderLeft: 'none', borderRight: 'none', borderBottom: 'none', borderRadius: '0' }}>
+        <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-12">
+          <div className="flex flex-col items-center md:items-start gap-4">
+            <div className="flex items-center gap-3">
+              <Zap className="w-6 h-6 text-primary" />
+              <span className="text-2xl font-black tracking-tighter">STUDYFLOW<span className="text-primary">.ai</span></span>
+            </div>
+            <p className="text-[10px] text-white/20 font-black uppercase tracking-[0.3em]">Redefining Human Potential Since 2024</p>
           </div>
-          <div className="flex gap-8 text-sm text-white/40">
-            <Link href="#" className="hover:text-white transition-all">Privacy</Link>
-            <Link href="#" className="hover:text-white transition-all">Terms</Link>
-            <Link href="#" className="hover:text-white transition-all">Support</Link>
+          
+          <div className="flex gap-12 text-[10px] font-black uppercase tracking-[0.2em] text-white/30">
+            <Link href="#" className="hover:text-primary transition-all">Privacy</Link>
+            <Link href="#" className="hover:text-primary transition-all">Protocol</Link>
+            <Link href="#" className="hover:text-primary transition-all">Support</Link>
           </div>
-          <div className="flex gap-4">
-            <Link href="#" className="p-2 glass rounded-full hover:scale-110 transition-all"><Github className="w-4 h-4" /></Link>
-            <Link href="#" className="p-2 glass rounded-full hover:scale-110 transition-all"><Chrome className="w-4 h-4" /></Link>
+          
+          <div className="flex gap-6">
+            <Link href="#" className="p-4 glass rounded-[1.5rem] hover:scale-110 hover:border-primary/50 transition-all group">
+              <Github className="w-5 h-5 text-white/50 group-hover:text-primary" />
+            </Link>
+            <Link href="#" className="p-4 glass rounded-[1.5rem] hover:scale-110 hover:border-primary/50 transition-all group">
+              <Chrome className="w-5 h-5 text-white/50 group-hover:text-primary" />
+            </Link>
           </div>
+        </div>
+        <div className="mt-20 text-center">
+          <p className="text-[10px] text-white/10 font-black uppercase tracking-[0.5em]">Global Decentralized Network Status: Operational</p>
         </div>
       </footer>
     </div>

@@ -79,57 +79,57 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
 
   if (loading) {
     return (
-      <div className="h-screen w-full flex items-center justify-center bg-[#020205]">
-        <div className="flex flex-col items-center gap-4">
-          <div className="w-12 h-12 border-4 border-primary/20 border-t-primary rounded-full animate-spin" />
-          <p className="text-white/40 font-medium">Loading Workspace...</p>
+      <div className="h-screen w-full flex items-center justify-center bg-[#030014]">
+        <div className="flex flex-col items-center gap-6">
+          <div className="w-16 h-16 border-2 border-primary/20 border-t-primary rounded-full animate-spin" />
+          <p className="text-white/20 font-black uppercase tracking-[0.4em] text-xs">Initializing Secure Environment</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="flex h-screen bg-background text-foreground overflow-hidden">
+    <div className="flex h-screen bg-transparent text-foreground overflow-hidden selection:bg-primary/30">
       {/* Sidebar */}
       <motion.aside 
         initial={false}
-        animate={{ width: isCollapsed ? 80 : 280 }}
-        className="glass border-r border-white/5 flex flex-col z-50 relative"
+        animate={{ width: isCollapsed ? 90 : 300 }}
+        className="glass border-r border-white/5 flex flex-col z-50 relative m-4 rounded-[2rem] shadow-2xl"
       >
-        <div className="p-6 flex items-center justify-between">
+        <div className="p-8 flex items-center justify-between">
           {!isCollapsed && (
             <motion.div 
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              className="flex items-center gap-2"
+              className="flex items-center gap-3"
             >
-              <div className="p-1.5 bg-primary/20 rounded-lg neon-glow">
+              <div className="p-2 glass rounded-xl neon-halo">
                 <Zap className="w-5 h-5 text-primary" />
               </div>
-              <span className="font-bold tracking-tight">StudyFlow<span className="text-primary">.ai</span></span>
+              <span className="text-xl font-black tracking-tighter uppercase">STUDYFLOW</span>
             </motion.div>
           )}
           <button 
             onClick={() => setIsCollapsed(!isCollapsed)}
-            className="p-2 hover:bg-white/5 rounded-lg transition-colors ml-auto"
+            className="p-3 hover:bg-white/[0.05] rounded-xl transition-all ml-auto glass border-white/10"
           >
-            {isCollapsed ? <Menu className="w-5 h-5" /> : <X className="w-5 h-5" />}
+            {isCollapsed ? <Menu className="w-4 h-4" /> : <X className="w-4 h-4" />}
           </button>
         </div>
 
-        <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
+        <nav className="flex-1 px-4 py-6 space-y-2 overflow-y-auto">
           {sidebarItems.map((item) => (
             <Link key={item.href} href={item.href}>
               <div className={cn(
-                "flex items-center gap-3 px-3 py-3 rounded-xl transition-all group relative cursor-pointer",
+                "flex items-center gap-4 px-4 py-4 rounded-2xl transition-all duration-300 group relative cursor-pointer",
                 pathname === item.href 
-                  ? "bg-primary/20 text-primary shadow-[0_0_15px_rgba(139,92,246,0.1)] border border-primary/20" 
-                  : "hover:bg-white/5 text-white/50 hover:text-white"
+                  ? "bg-primary/10 text-primary border border-primary/20 shadow-[0_0_30px_rgba(139,92,246,0.1)]" 
+                  : "hover:bg-white/[0.03] text-white/40 hover:text-white"
               )}>
-                <item.icon className={cn("w-5 h-5", pathname === item.href ? "text-primary" : "text-inherit")} />
-                {!isCollapsed && <span className="font-medium text-sm">{item.label}</span>}
+                <item.icon className={cn("w-5 h-5 transition-transform group-hover:scale-110", pathname === item.href ? "text-primary" : "text-inherit")} />
+                {!isCollapsed && <span className="font-bold text-xs uppercase tracking-widest">{item.label}</span>}
                 {isCollapsed && (
-                  <div className="absolute left-16 px-2 py-1 bg-popover text-white text-xs rounded opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity whitespace-nowrap z-50">
+                  <div className="absolute left-20 px-3 py-2 glass text-white text-[10px] uppercase font-black tracking-widest rounded-xl opacity-0 group-hover:opacity-100 pointer-events-none transition-all translate-x-[-10px] group-hover:translate-x-0 z-50">
                     {item.label}
                   </div>
                 )}
@@ -138,51 +138,54 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
           ))}
         </nav>
 
-        <div className="p-4 border-t border-white/5 space-y-1">
-          <button className="flex items-center gap-3 w-full px-3 py-3 rounded-xl hover:bg-white/5 text-white/50 hover:text-white transition-all">
-            <Settings className="w-5 h-5" />
-            {!isCollapsed && <span className="text-sm font-medium">Settings</span>}
+        <div className="p-6 border-t border-white/5 space-y-2">
+          <button className="flex items-center gap-4 w-full px-4 py-4 rounded-2xl hover:bg-white/[0.03] text-white/40 hover:text-white transition-all group">
+            <Settings className="w-5 h-5 group-hover:rotate-45 transition-transform" />
+            {!isCollapsed && <span className="text-xs font-bold uppercase tracking-widest">Settings</span>}
           </button>
           <button 
             onClick={handleLogout}
-            className="flex items-center gap-3 w-full px-3 py-3 rounded-xl hover:bg-red-500/10 text-red-500/70 hover:text-red-500 transition-all"
+            className="flex items-center gap-4 w-full px-4 py-4 rounded-2xl hover:bg-red-500/10 text-red-500/40 hover:text-red-500 transition-all group"
           >
-            <LogOut className="w-5 h-5" />
-            {!isCollapsed && <span className="text-sm font-medium">Log Out</span>}
+            <LogOut className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
+            {!isCollapsed && <span className="text-xs font-bold uppercase tracking-widest">Terminate</span>}
           </button>
         </div>
       </motion.aside>
 
       {/* Main Content */}
-      <main className="flex-1 flex flex-col min-w-0 bg-[#020205] relative overflow-hidden">
+      <main className="flex-1 flex flex-col min-w-0 bg-transparent relative overflow-hidden">
         {/* Subtle top bar inside dashboard */}
-        <header className="h-16 border-b border-white/5 flex items-center justify-between px-8 bg-black/20 backdrop-blur-md sticky top-0 z-40">
-          <div className="flex items-center gap-4">
-            <h1 className="font-semibold text-lg">
-              {sidebarItems.find(i => i.href === pathname)?.label || "Dashboard"}
-            </h1>
+        <header className="h-24 border-b border-white/5 flex items-center justify-between px-10 glass m-4 mb-0 rounded-[2rem] sticky top-0 z-40">
+          <div className="flex items-center gap-6">
+            <div className="flex flex-col">
+              <span className="text-[10px] font-black uppercase tracking-[0.3em] text-white/20 leading-none mb-1">Navigation / {pathname.split('/').pop() || 'Overview'}</span>
+              <h1 className="font-black text-2xl uppercase tracking-tight">
+                {sidebarItems.find(i => i.href === pathname)?.label || "Workspace"}
+              </h1>
+            </div>
           </div>
           
           <Link href="/dashboard/settings">
-            <div className="flex items-center gap-3 cursor-pointer group">
-              <div className="hidden md:flex flex-col items-end">
-                <span className="text-sm font-bold group-hover:text-primary transition-colors">{user?.user_metadata?.full_name || user?.email?.split('@')[0]}</span>
-                <span className="text-[10px] text-white/40 font-black uppercase tracking-widest leading-none">Pro Member</span>
-              </div>
-              <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-primary to-purple-600 border border-white/10 overflow-hidden ring-0 group-hover:ring-2 ring-primary/50 transition-all">
+            <div className="flex items-center gap-4 cursor-pointer group glass p-2 pr-6 rounded-full border-white/10 hover:border-primary/50 transition-all">
+              <div className="w-12 h-12 rounded-full bg-gradient-to-tr from-primary to-secondary border border-white/10 overflow-hidden ring-0 group-hover:ring-4 ring-primary/20 transition-all">
                 {user?.user_metadata?.avatar_url ? (
                   <img src={user.user_metadata.avatar_url} alt="Profile" className="w-full h-full object-cover" />
                 ) : (
-                  <div className="w-full h-full flex items-center justify-center text-xs font-bold">
+                  <div className="w-full h-full flex items-center justify-center text-sm font-black text-white">
                     {user?.email?.[0].toUpperCase()}
                   </div>
                 )}
+              </div>
+              <div className="hidden md:flex flex-col items-start leading-tight">
+                <span className="text-xs font-black uppercase tracking-widest group-hover:text-primary transition-colors">{user?.user_metadata?.full_name || user?.email?.split('@')[0]}</span>
+                <span className="text-[10px] text-white/20 font-black uppercase tracking-[0.1em]">Level 01 Scholar</span>
               </div>
             </div>
           </Link>
         </header>
 
-        <div className="flex-1 overflow-y-auto p-8 relative">
+        <div className="flex-1 overflow-y-auto p-10 relative custom-scrollbar">
           {children}
         </div>
       </main>
