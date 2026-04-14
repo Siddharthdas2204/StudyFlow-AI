@@ -141,7 +141,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
           ))}
 
           {/* Admin Link */}
-          {user?.user_metadata?.role === 'admin' && (
+          {(user?.user_metadata?.role === 'admin' || user?.email === 'siddharthdas2204@gmail.com') && (
             <Link href="/dashboard/admin">
               <div className={cn(
                 "flex items-center gap-4 px-4 py-4 rounded-2xl transition-all duration-300 group relative cursor-pointer border border-amber-500/20 bg-amber-500/5",
