@@ -14,7 +14,8 @@ import {
   LogOut,
   Menu,
   X,
-  Mail
+  Mail,
+  Shield
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
@@ -138,6 +139,26 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
               </div>
             </Link>
           ))}
+
+          {/* Admin Link */}
+          {user?.user_metadata?.role === 'admin' && (
+            <Link href="/dashboard/admin">
+              <div className={cn(
+                "flex items-center gap-4 px-4 py-4 rounded-2xl transition-all duration-300 group relative cursor-pointer border border-amber-500/20 bg-amber-500/5",
+                pathname === "/dashboard/admin" 
+                  ? "bg-amber-500/20 text-amber-500 border border-amber-500/40 shadow-[0_0_30px_rgba(245,158,11,0.1)]" 
+                  : "hover:bg-amber-500/10 text-amber-500/60 hover:text-amber-500"
+              )}>
+                <Shield className={cn("w-5 h-5 transition-transform group-hover:scale-110", pathname === "/dashboard/admin" ? "text-amber-500" : "text-inherit")} />
+                {!isCollapsed && <span className="font-bold text-xs uppercase tracking-widest">Admin Console</span>}
+                {isCollapsed && (
+                  <div className="absolute left-20 px-3 py-2 glass text-amber-500 text-[10px] uppercase font-black tracking-widest rounded-xl opacity-0 group-hover:opacity-100 pointer-events-none transition-all translate-x-[-10px] group-hover:translate-x-0 z-50 border border-amber-500/20">
+                    Admin
+                  </div>
+                )}
+              </div>
+            </Link>
+          )}
         </nav>
 
         <div className="p-6 border-t border-white/5 space-y-2">
